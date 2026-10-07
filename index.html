@@ -233,6 +233,7 @@ nav button.on{color:var(--yink)!important;background:linear-gradient(135deg,#ffc
 .res{border-bottom-color:rgba(255,205,40,.2)!important}
 *{scrollbar-color:#ffc400 #14110a}
 </style>
+<style>nav{grid-template-columns:repeat(3,1fr)!important}</style>
 </head>
 <body>
 <header>
@@ -255,6 +256,7 @@ nav button.on{color:var(--yink)!important;background:linear-gradient(135deg,#ffc
         <div><label>نام محصول</label><input id="pName" placeholder="مثلاً کیک خامه‌ای" autocomplete="off"></div>
         <div><label>تعداد تولید</label><input id="pCount" inputmode="decimal" value="1"></div>
       </div>
+      <div style="margin-top:10px"><label>دسته (در بخش دستورها ذخیره می‌شود)</label><select id="pCat"></select></div>
     </div>
     <div class="card">
       <h2>مواد اولیه</h2>
@@ -269,6 +271,10 @@ nav button.on{color:var(--yink)!important;background:linear-gradient(135deg,#ffc
       </div>
     </div>
     <div class="card">
+      <h2>توضیحات و طرز تهیه</h2>
+      <textarea id="pNotes" style="min-height:120px;margin-bottom:0" placeholder="طرز تهیه، دمای فر، نکته‌ها و هر توضیحی که می‌خواهی کنار این دستور بماند"></textarea>
+    </div>
+    <div class="card">
       <h2>نتیجه</h2>
       <div class="res"><span>مواد اولیه</span><b id="r1"></b></div>
       <div class="res"><span>هزینه‌های دیگر</span><b id="r2"></b></div>
@@ -276,7 +282,7 @@ nav button.on{color:var(--yink)!important;background:linear-gradient(135deg,#ffc
       <div class="res big"><span>قیمت نهایی</span><b id="r4"></b></div>
       <div class="res"><span>قیمت هر عدد</span><b id="r5"></b></div>
       <div class="g2" style="margin-top:12px">
-        <button class="btn b1" id="save">ذخیره در سوابق</button>
+        <button class="btn b1" id="save">ذخیره در دستورها</button>
         <button class="btn b3" id="copy">کپی نتیجه</button>
       </div>
       <button class="btn bd" id="newCalc" style="width:100%;margin-top:8px">محاسبه جدید</button>
@@ -305,21 +311,13 @@ nav button.on{color:var(--yink)!important;background:linear-gradient(135deg,#ffc
       <div class="g2" style="margin-top:10px;display:none" id="catAct"><button class="btn b2" id="cRen">تغییر نام دسته</button><button class="btn bd" id="cDel" style="background:#fff1f3">حذف دسته</button></div>
       <div class="g2" style="margin-top:12px"><input id="cName" placeholder="دسته جدید، مثلاً دسر" autocomplete="off"><button class="btn b2" id="cAdd">افزودن دسته</button></div>
     </div>
-    <div class="card" id="rForm">
-      <h2 id="rH">دستور جدید</h2>
-      <div class="fl"><label>نام دستور</label><input id="rName" placeholder="مثلاً کیک یزدی" autocomplete="off"></div>
-      <div class="fl"><label>دسته</label><select id="rCat"></select></div>
-      <label>مواد لازم</label><textarea id="rIng" placeholder="هر ماده را در یک خط بنویس"></textarea>
-      <label>طرز تهیه</label><textarea id="rSteps" style="min-height:160px" placeholder="مراحل را بنویس"></textarea>
-      <div class="g2"><button class="btn b1" id="rSave">ذخیره دستور</button><button class="btn b3" id="rCancel">انصراف</button></div>
-    </div>
-    <div class="card"><h2>دستورهای من</h2><div id="recList"></div></div>
+    <div class="card"><h2>دستورهای من</h2><button class="btn b1" id="recNew" style="width:100%;margin-bottom:6px">＋ دستور جدید (رفتن به محاسبه)</button><div id="recList"></div></div>
   </section>
 
   <section class="view" id="v-set">
     <div class="card">
       <h2>پشتیبان‌گیری</h2>
-      <p class="hint">مواد، سوابق، دستورها و دسته‌ها در یک فایل ذخیره می‌شوند. فایل را جای امنی نگه دار (تلگرام، Drive، ایمیل).</p>
+      <p class="hint">مواد، دستورها و دسته‌ها در یک فایل ذخیره می‌شوند. فایل را جای امنی نگه دار (تلگرام، Drive، ایمیل).</p>
       <div class="g2"><button class="btn b1" id="bkFile">دانلود فایل پشتیبان</button><button class="btn b3" id="bkCopy">کپی متن پشتیبان</button></div>
       <p class="hint" id="lastBk" style="margin:10px 0 0"></p>
     </div>
@@ -332,7 +330,7 @@ nav button.on{color:var(--yink)!important;background:linear-gradient(135deg,#ffc
     </div>
     <div class="card">
       <h2>حذف اطلاعات</h2>
-      <p class="hint">همه مواد، سوابق، دستورها و دسته‌ها از این گوشی پاک می‌شود و برگشت ندارد. بهتر است اول پشتیبان بگیری.</p>
+      <p class="hint">همه مواد، دستورها و دسته‌ها از این گوشی پاک می‌شود و برگشت ندارد. بهتر است اول پشتیبان بگیری.</p>
       <button class="btn bd" id="wipe" style="width:100%;background:#fff1f3">حذف همه اطلاعات</button>
     </div>
   </section>
@@ -343,10 +341,11 @@ nav button.on{color:var(--yink)!important;background:linear-gradient(135deg,#ffc
       <p class="hint" style="margin:0">با این برنامه قیمت تمام‌شده کیک و شیرینی را حساب می‌کنی، دستورهایت را نگه می‌داری و از همه چیز پشتیبان می‌گیری. روی هر عنوان بزن تا آموزشش باز شود.</p>
     </div>
     <div class="card" style="padding:8px 12px">
-      <details class="rc" open><summary>شروع سریع (۳ قدم)</summary><div class="rb"><ol class="hp">
+      <details class="rc" open><summary>شروع سریع (۴ قدم)</summary><div class="rb"><ol class="hp">
         <li>پایین صفحه روی «محاسبه» بزن و اسم محصول و تعداد تولید را بنویس.</li>
         <li>«افزودن ماده» را بزن، اسم ماده، قیمت و مقدار مصرفی را بنویس.</li>
         <li>درصد سود را بنویس. قیمت نهایی و قیمت هر عدد پایین صفحه و بالای صفحه نشان داده می‌شود.</li>
+        <li>دسته را انتخاب کن، توضیحات و طرز تهیه را بنویس و «ذخیره در دستورها» را بزن.</li>
       </ol></div></details>
 
       <details class="rc"><summary>حساب کردن قیمت در بخش محاسبه</summary><div class="rb"><ol class="hp">
@@ -366,18 +365,21 @@ nav button.on{color:var(--yink)!important;background:linear-gradient(135deg,#ffc
         <li>«حذف» فقط ماده را از لیست پیشنهادها برمی‌دارد. محاسبه‌های قبلی تغییر نمی‌کنند.</li>
       </ol></div></details>
 
-      <details class="rc"><summary>ذخیره و ویرایش محاسبه (سوابق)</summary><div class="rb"><ol class="hp">
-        <li>بعد از حساب کردن، «ذخیره در سوابق» را بزن.</li>
-        <li>در صفحه «سوابق»، «ویرایش» محاسبه را باز می‌کند و بعد از تغییر با «به‌روزرسانی سوابق» همان مورد عوض می‌شود.</li>
-        <li>«استفاده مجدد» محاسبه را به‌عنوان یک مورد تازه باز می‌کند و قبلی می‌ماند. برای محصولی مثل قبل با قیمت‌های جدید خوب است.</li>
-        <li>«محاسبه جدید» پایین نتیجه، همه چیز را پاک می‌کند تا از اول شروع کنی.</li>
+      <details class="rc"><summary>ذخیره محاسبه در دستورها</summary><div class="rb"><ol class="hp">
+        <li>در صفحه «محاسبه» اسم محصول، مواد، قیمت‌ها و مقدار را بنویس.</li>
+        <li>از بخش «دسته» جای دستور را انتخاب کن و در کادر «توضیحات و طرز تهیه» هر نکته‌ای که می‌خواهی را بنویس.</li>
+        <li>«ذخیره در دستورها» را بزن. محاسبه، دسته و توضیحات یک‌جا در بخش «دستورها» نگه داشته می‌شود.</li>
+        <li>بعد از ذخیره، همان صفحه در حالت ویرایش می‌ماند. هر تغییری دادی با «به‌روزرسانی دستور» همان مورد عوض می‌شود.</li>
+        <li>«محاسبه جدید» پایین نتیجه، همه چیز را پاک می‌کند تا محصول دیگری را شروع کنی.</li>
       </ol></div></details>
 
       <details class="rc"><summary>دستورها و دسته‌بندی</summary><div class="rb"><ol class="hp">
         <li>در صفحه «دستورها» دسته‌های «شیرینی‌ها» و «غذاها» آماده است. دسته دیگری لازم داشتی، اسمش را بنویس و «افزودن دسته» را بزن.</li>
-        <li>اسم دستور، دسته، مواد لازم (هر ماده در یک خط) و طرز تهیه را بنویس و «ذخیره دستور» را بزن. دستور در همان دسته قرار می‌گیرد.</li>
         <li>روی یک دسته بزن تا فقط دستورهای آن را ببینی. همان‌جا می‌توانی نام دسته را عوض یا دسته را حذف کنی.</li>
-        <li>روی اسم هر دستور بزن تا باز شود. از آنجا می‌توانی ویرایش، کپی، انتقال به دسته دیگر یا حذفش کنی.</li>
+        <li>روی اسم هر دستور بزن تا باز شود. مواد با مقدار و هزینه، قیمت نهایی، قیمت هر عدد و توضیحات را یک‌جا می‌بینی.</li>
+        <li><b>ویرایش</b> دستور را در صفحه محاسبه باز می‌کند. <b>استفاده مجدد</b> آن را به‌عنوان یک مورد تازه باز می‌کند و قبلی می‌ماند (برای قیمت‌های جدید خوب است).</li>
+        <li>از همین‌جا می‌توانی دستور را کپی، به دسته دیگر منتقل یا حذف کنی.</li>
+        <li>دستورها و سوابقی که قبلاً ذخیره کرده بودی خودکار به این بخش آمده‌اند (در «بدون دسته»).</li>
       </ol></div></details>
 
       <details class="rc"><summary>پشتیبان‌گیری و بازیابی</summary><div class="rb"><ol class="hp">
@@ -406,9 +408,7 @@ nav button.on{color:var(--yink)!important;background:linear-gradient(135deg,#ffc
     <button class="btn b1" id="helpGo" style="width:100%">شروع کار</button>
   </section>
 
-  <section class="view" id="v-his">
-    <div class="card"><h2>سوابق محاسبه</h2><div id="hisList"></div><button class="btn bd" id="hisClear" style="width:100%;margin-top:8px;display:none">حذف همه سوابق</button></div>
-  </section>
+  
 </main>
 
 <div class="bar on" id="bar"><div class="in"><div><small>قیمت نهایی</small><b id="bTotal">۰ تومان</b></div><div style="text-align:left"><small>هر عدد</small><b id="bUnit" style="font-size:14px">۰</b></div></div></div>
@@ -417,7 +417,6 @@ nav button.on{color:var(--yink)!important;background:linear-gradient(135deg,#ffc
   <button data-v="calc" class="on"><i>🧮</i>محاسبه</button>
   <button data-v="ing"><i>🥣</i>مواد من</button>
   <button data-v="rec"><i>📖</i>دستورها</button>
-  <button data-v="his"><i>🗂</i>سوابق</button>
 </nav>
 <datalist id="dl"></datalist>
 <div class="tg" id="tg"></div>
@@ -471,7 +470,7 @@ function calc(){
   var base=mat+ex,profit=base*pr/100,fin=base+profit;
   return {mat:mat,ex:ex,pr:pr,cnt:cnt,profit:profit,fin:fin,unit:fin/cnt};
 }
-function saveDraft(){store.set("cy_draft",{name:$("pName").value,count:$("pCount").value,extra:$("extra").value,profit:$("profit").value,rows:rows})}
+function saveDraft(){store.set("cy_draft",{name:$("pName").value,count:$("pCount").value,extra:$("extra").value,profit:$("profit").value,cat:calcCat,notes:$("pNotes").value,rows:rows})}
 function paint(){
   var c=calc();
   $("k1").textContent=fa(c.mat);$("k2").textContent=fa(c.profit);$("k3").textContent=fa(c.unit);
@@ -512,7 +511,7 @@ $("rows").addEventListener("click",function(e){
   var o=rowOf(e.target);if(!o)return;rows.splice(o.i,1);renderRows();
 });
 $("addRow").onclick=function(){rows.push({id:uid++,n:"",p:"",u:"kg",q:""});renderRows()};
-["pName","pCount","extra","profit"].forEach(function(id){$(id).addEventListener("input",paint)});
+["pName","pCount","extra","profit","pNotes"].forEach(function(id){$(id).addEventListener("input",paint)});
 
 function summaryText(){
   var c=calc(),n=$("pName").value.trim()||"محصول";
@@ -523,22 +522,36 @@ $("copy").onclick=function(){
   function fb(){var a=document.createElement("textarea");a.value=t;a.style.position="fixed";a.style.opacity="0";document.body.appendChild(a);a.select();try{document.execCommand("copy");toast("کپی شد")}catch(e){toast("کپی نشد")}document.body.removeChild(a)}
   if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(t).then(function(){toast("کپی شد")},fb)}else fb();
 };
-var histEdit=-1;
-function setEditMode(k){histEdit=k;$("editBanner").style.display=k>=0?"flex":"none";if(k>=0)$("editName").textContent=hist[k].name;$("save").textContent=k>=0?"به‌روزرسانی سوابق":"ذخیره در سوابق"}
+function setEditMode(k){rEdit=k;$("editBanner").style.display=k>=0?"flex":"none";if(k>=0)$("editName").textContent=recs[k].n;$("save").textContent=k>=0?"به‌روزرسانی دستور":"ذخیره در دستورها"}
+var keepI="";
+function recCalc(r){
+  var mat=(r.rows||[]).reduce(function(t,x){return t+rowCost(x)},0),ex=P(r.extra),pr=P(r.profit),cnt=P(r.count)||1;
+  var base=mat+ex,profit=base*pr/100,fin=base+profit;
+  return {mat:mat,ex:ex,pr:pr,cnt:cnt,profit:profit,fin:fin,unit:fin/cnt};
+}
 $("save").onclick=function(){
-  if(!rows.length){toast("اول مواد را اضافه کن");return}
+  var name=$("pName").value.trim();
+  if(!name){toast("اسم محصول را بنویس");return}
+  if(!rows.length&&!$("pNotes").value.trim()){toast("مواد یا توضیحات را اضافه کن");return}
   var c=calc();
-  var rec={id:Date.now(),d:new Date().toLocaleDateString("fa-IR"),name:$("pName").value.trim()||"محصول بدون نام",count:$("pCount").value,extra:$("extra").value,profit:$("profit").value,fin:c.fin,unit:c.unit,rows:JSON.parse(JSON.stringify(rows))};
-  if(histEdit>=0&&hist[histEdit]){rec.id=hist[histEdit].id;rec.d=hist[histEdit].d;hist[histEdit]=rec;toast("سوابق به‌روز شد")}
-  else{hist.unshift(rec);toast("در سوابق ذخیره شد")}
-  store.set("cy_his",hist);setEditMode(-1);renderHis();
+  var rec={id:Date.now(),n:name,c:calcCat,s:$("pNotes").value.trim(),i:keepI,rows:JSON.parse(JSON.stringify(rows)),count:$("pCount").value,extra:$("extra").value,profit:$("profit").value,fin:c.fin,unit:c.unit,d:new Date().toLocaleDateString("fa-IR")};
+  if(rEdit>=0&&recs[rEdit]){rec.id=recs[rEdit].id;rec.d=recs[rEdit].d;recs[rEdit]=rec;toast("دستور به‌روز شد")}
+  else{recs.unshift(rec);toast(calcCat?"در «"+calcCat+"» ذخیره شد":"در دستورها ذخیره شد")}
+  rFilter=calcCat===""?"all":calcCat;saveRec();renderRec();setEditMode(recs.indexOf(rec));
 };
 $("editCancel").onclick=function(){setEditMode(-1)};
 $("clearRows").onclick=function(){if(!rows.length)return;if(confirm("همه مواد این محاسبه پاک شوند؟")){rows=[];renderRows()}};
-$("newCalc").onclick=function(){
-  if((rows.length||$("pName").value.trim())&&!confirm("محاسبه فعلی پاک شود و محاسبه جدید شروع شود؟"))return;
-  $("pName").value="";$("pCount").value="1";$("extra").value="";$("profit").value="30";rows=[];setEditMode(-1);renderRows();window.scrollTo(0,0);
-};
+function hasCalc(){return rows.length||$("pName").value.trim()||$("pNotes").value.trim()}
+function resetCalc(){
+  $("pName").value="";$("pCount").value="1";$("extra").value="";$("profit").value="30";$("pNotes").value="";
+  calcCat=cats[0]||"";keepI="";rows=[];setEditMode(-1);fillCat();renderRows();window.scrollTo(0,0);
+}
+function newCalcFlow(cat){
+  if(hasCalc()&&!confirm("محاسبه فعلی پاک شود و محاسبه جدید شروع شود؟"))return;
+  resetCalc();if(cat!=null){calcCat=cat;fillCat()}show("calc");
+}
+$("newCalc").onclick=function(){newCalcFlow()};
+$("pCat").onchange=function(){calcCat=this.value;paint()};
 
 function renderIng(){
   $("ingList").innerHTML=ing.length?ing.map(function(i,k){
@@ -560,28 +573,18 @@ $("ingList").addEventListener("click",function(e){
   if(t.hasAttribute("data-d")){k=+t.getAttribute("data-d");if(confirm("«"+ing[k].n+"» حذف شود؟")){ing.splice(k,1);store.set("cy_ing",ing);resetIng();renderIng();renderRows()}}
 });
 
-function renderHis(){
-  $("hisList").innerHTML=hist.length?hist.map(function(h,k){
-    return '<div class="li" style="flex-wrap:wrap"><div><div class="n">'+esc(h.name)+'</div><div class="m">'+esc(h.d)+' · نهایی '+T(h.fin)+' · هر عدد '+T(h.unit)+'</div></div><div><button class="btn b2" data-he="'+k+'" style="min-height:38px">ویرایش</button> <button class="btn b3" data-l="'+k+'" style="min-height:38px">استفاده مجدد</button><button class="btn bd" data-x="'+k+'">حذف</button></div></div>';
-  }).join(""):'<div class="empty">هنوز محاسبه‌ای ذخیره نکرده‌ای.<br>در صفحه محاسبه «ذخیره در سوابق» را بزن.</div>';
-  $("hisClear").style.display=hist.length?"block":"none";
+function loadRec(k,asNew){
+  var r=recs[k];
+  $("pName").value=r.n;$("pCount").value=r.count||1;$("extra").value=r.extra||"";
+  $("profit").value=(r.profit!=null&&r.profit!=="")?r.profit:"30";
+  var legacy=!(r.rows&&r.rows.length)&&r.i;
+  $("pNotes").value=legacy?("مواد لازم:\n"+r.i+(r.s?"\n\nطرز تهیه:\n"+r.s:"")):(r.s||"");
+  keepI=legacy?"":(r.i||"");calcCat=r.c||"";
+  rows=norm(JSON.parse(JSON.stringify(r.rows||[])));uid=rows.reduce(function(m,x){return Math.max(m,x.id||0)},0)+1;
+  setEditMode(asNew?-1:k);fillCat();renderRows();show("calc");
 }
-function loadHist(k){
-  var h=hist[k];
-  $("pName").value=h.name;$("pCount").value=h.count||1;$("extra").value=h.extra||"";$("profit").value=h.profit||"";
-  rows=norm(JSON.parse(JSON.stringify(h.rows)));uid=rows.reduce(function(m,r){return Math.max(m,r.id||0)},0)+1;
-  renderRows();show("calc");
-}
-$("hisList").addEventListener("click",function(e){
-  var t=e.target,k;
-  if(t.hasAttribute("data-he")){k=+t.getAttribute("data-he");loadHist(k);setEditMode(k);toast("ویرایش کن و «به‌روزرسانی سوابق» را بزن")}
-  if(t.hasAttribute("data-l")){k=+t.getAttribute("data-l");loadHist(k);setEditMode(-1);toast("به‌عنوان محاسبه جدید باز شد")}
-  if(t.hasAttribute("data-x")){k=+t.getAttribute("data-x");if(confirm("این مورد حذف شود؟")){hist.splice(k,1);if(histEdit===k)setEditMode(-1);else if(histEdit>k)histEdit--;store.set("cy_his",hist);renderHis()}}
-});
-$("hisClear").onclick=function(){if(confirm("همه سوابق حذف شوند؟")){hist=[];setEditMode(-1);store.set("cy_his",hist);renderHis()}};
-
 function show(v){
-  ["calc","ing","rec","his","set","help"].forEach(function(x){$("v-"+x).classList.toggle("on",x===v)});
+  ["calc","ing","rec","set","help"].forEach(function(x){$("v-"+x).classList.toggle("on",x===v)});
   Array.prototype.forEach.call(document.querySelectorAll("nav button"),function(b){b.classList.toggle("on",b.getAttribute("data-v")===v)});
   $("bar").classList.toggle("on",v==="calc");
   window.scrollTo(0,0);
@@ -592,7 +595,15 @@ Array.prototype.forEach.call(document.querySelectorAll("nav button"),function(b)
 var cats=store.get("cy_cats",null);if(!Array.isArray(cats)||!cats.length)cats=["شیرینی‌ها","غذاها"];
 var recs=store.get("cy_rec",[]);if(!Array.isArray(recs))recs=[];
 var rFilter="all",rEdit=-1;
+var calcCat=(draft.cat!=null)?draft.cat:(cats[0]||"");
+$("pNotes").value=draft.notes||"";
 function saveRec(){store.set("cy_cats",cats);store.set("cy_rec",recs)}
+function migrateHist(){
+  if(!hist.length)return;
+  hist.forEach(function(h){recs.push({id:h.id||Date.now(),n:h.name||"بدون نام",c:"",s:"",i:"",rows:h.rows||[],count:h.count,extra:h.extra,profit:h.profit,fin:h.fin,unit:h.unit,d:h.d})});
+  hist=[];store.set("cy_his",hist);saveRec();
+}
+migrateHist();
 function copyText(t){
   function fb(){var a=document.createElement("textarea");a.value=t;a.style.position="fixed";a.style.opacity="0";document.body.appendChild(a);a.select();try{document.execCommand("copy");toast("کپی شد")}catch(e){toast("کپی نشد")}document.body.removeChild(a)}
   if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(t).then(function(){toast("کپی شد")},fb)}else fb();
@@ -601,14 +612,45 @@ function catOpts(sel){
   var o=cats.map(function(c){return '<option value="'+esc(c)+'"'+(c===sel?" selected":"")+'>'+esc(c)+'</option>'}).join("");
   return o+'<option value=""'+(sel===""?" selected":"")+'>بدون دسته</option>';
 }
+function fillCat(){$("pCat").innerHTML=catOpts(calcCat);calcCat=$("pCat").value}
+function fq(n){try{return n.toLocaleString("fa-IR",{maximumFractionDigits:2})}catch(e){return String(n)}}
+function recText(r){
+  var t=r.n;
+  if(r.rows&&r.rows.length){
+    var c=recCalc(r);
+    t+="\n\nمواد لازم:\n"+r.rows.map(function(x){var q=P(x.q);return "- "+(x.n||"—")+(q?" – "+fq(q)+(x.u==="pc"?" عدد":" گرم"):"")+" – "+T(rowCost(x))}).join("\n");
+    t+="\n\nهزینه مواد: "+T(c.mat)+"\nهزینه‌های دیگر: "+T(c.ex)+"\nسود ("+fa(c.pr)+"٪): "+T(c.profit)+"\nقیمت نهایی: "+T(c.fin)+"\nقیمت هر عدد: "+T(c.unit);
+  }
+  if(r.i)t+="\n\nمواد لازم:\n"+r.i;
+  if(r.s)t+="\n\nتوضیحات و طرز تهیه:\n"+r.s;
+  return t;
+}
+function recBody(r,k){
+  var h="";
+  if(r.rows&&r.rows.length){
+    var c=recCalc(r);
+    h+='<div class="lb">مواد لازم</div>'+r.rows.map(function(x){var q=P(x.q);return '<div class="res"><span>'+esc(x.n||"—")+(q?" – "+fq(q)+(x.u==="pc"?" عدد":" گرم"):"")+'</span><b>'+T(rowCost(x))+'</b></div>'}).join("");
+    h+='<div class="lb">قیمت</div>'+
+      '<div class="res"><span>هزینه مواد</span><b>'+T(c.mat)+'</b></div>'+
+      '<div class="res"><span>هزینه‌های دیگر</span><b>'+T(c.ex)+'</b></div>'+
+      '<div class="res"><span>سود ('+fa(c.pr)+'٪)</span><b>'+T(c.profit)+'</b></div>'+
+      '<div class="res big"><span>قیمت نهایی</span><b>'+T(c.fin)+'</b></div>'+
+      '<div class="res"><span>قیمت هر عدد ('+fa(c.cnt)+' عدد)</span><b>'+T(c.unit)+'</b></div>';
+  }
+  if(r.i)h+='<div class="lb">مواد لازم</div><div class="tx">'+esc(r.i)+'</div>';
+  if(r.s)h+='<div class="lb">توضیحات و طرز تهیه</div><div class="tx">'+esc(r.s)+'</div>';
+  h+='<div class="lb">انتقال به دسته</div><select class="mv" data-mv="'+k+'">'+catOpts(r.c)+'</select>'+
+    '<div class="g2" style="margin-top:10px"><button class="btn b1" data-ed="'+k+'">ویرایش</button><button class="btn b2" data-nw="'+k+'">استفاده مجدد</button></div>'+
+    '<div class="g2" style="margin-top:6px"><button class="btn b3" data-cp="'+k+'">کپی</button><button class="btn bd" data-rd="'+k+'">حذف</button></div>';
+  return h;
+}
 function renderRec(){
   if(rFilter!=="all"&&cats.indexOf(rFilter)<0)rFilter="all";
   $("chips").innerHTML='<button class="chip'+(rFilter==="all"?" on":"")+'" data-i="-1">همه ('+fa(recs.length)+')</button>'+cats.map(function(c,i){
     var n=recs.filter(function(r){return r.c===c}).length;
     return '<button class="chip'+(rFilter===c?" on":"")+'" data-i="'+i+'">'+esc(c)+' ('+fa(n)+')</button>'}).join("");
   $("catAct").style.display=rFilter==="all"?"none":"grid";
-  var cur=$("rCat").value;if(cur===""&&!$("rCat").options.length)cur=rFilter==="all"?cats[0]||"":rFilter;
-  $("rCat").innerHTML=catOpts(cur);
+  fillCat();
   var groups=rFilter==="all"?cats.slice():[rFilter];
   if(rFilter==="all"&&recs.some(function(r){return cats.indexOf(r.c)<0}))groups.push("");
   var html="",any=false;
@@ -616,56 +658,43 @@ function renderRec(){
     var items=[];recs.forEach(function(r,k){if(g===""?cats.indexOf(r.c)<0:r.c===g)items.push(k)});
     if(!items.length)return;any=true;
     html+='<div class="gh">'+esc(g||"بدون دسته")+'</div>'+items.map(function(k){
-      var r=recs[k];
-      return '<details class="rc"><summary>'+esc(r.n)+'</summary><div class="rb">'+
-        (r.i?'<div class="lb">مواد لازم</div><div class="tx">'+esc(r.i)+'</div>':'')+
-        (r.s?'<div class="lb">طرز تهیه</div><div class="tx">'+esc(r.s)+'</div>':'')+
-        '<div class="lb">انتقال به دسته</div><select class="mv" data-mv="'+k+'">'+catOpts(r.c)+'</select>'+
-        '<div class="g2" style="margin-top:10px"><button class="btn b2" data-ed="'+k+'">ویرایش</button><button class="btn b3" data-cp="'+k+'">کپی</button></div>'+
-        '<button class="btn bd" data-rd="'+k+'" style="margin-top:6px">حذف دستور</button></div></details>';
+      var r=recs[k],sub="";
+      if(r.rows&&r.rows.length)sub=' <span style="font-weight:400;font-size:12px;color:var(--mute)">– هر عدد '+T(recCalc(r).unit)+'</span>';
+      return '<details class="rc"><summary>'+esc(r.n)+sub+'</summary><div class="rb">'+recBody(r,k)+'</div></details>';
     }).join("");
   });
-  $("recList").innerHTML=any?html:'<div class="empty">'+(rFilter==="all"?"هنوز دستوری ننوشته‌ای.<br>از فرم بالا اولین دستور را بنویس.":"در این دسته دستوری نیست.")+'</div>';
+  $("recList").innerHTML=any?html:'<div class="empty">'+(rFilter==="all"?"هنوز دستوری ذخیره نکرده‌ای.<br>در صفحه «محاسبه» مواد و توضیحات را بنویس و «ذخیره در دستورها» را بزن.":"در این دسته دستوری نیست.")+'</div>';
 }
-function resetRec(){rEdit=-1;$("rName").value="";$("rIng").value="";$("rSteps").value="";$("rH").textContent="دستور جدید"}
+$("recNew").onclick=function(){newCalcFlow(rFilter==="all"?(cats[0]||""):rFilter)};
 $("chips").addEventListener("click",function(e){
   var b=e.target.closest(".chip");if(!b)return;
-  var i=+b.getAttribute("data-i");rFilter=i<0?"all":cats[i];
-  if(i>=0)$("rCat").value=cats[i];renderRec();
+  var i=+b.getAttribute("data-i");rFilter=i<0?"all":cats[i];renderRec();
 });
 $("cAdd").onclick=function(){
   var n=$("cName").value.trim();
   if(!n){toast("اسم دسته را بنویس");return}
   if(cats.indexOf(n)>=0){toast("این دسته قبلاً هست");return}
-  cats.push(n);rFilter=n;saveRec();$("cName").value="";$("rCat").innerHTML=catOpts(n);renderRec();toast("دسته «"+n+"» ساخته شد");
+  cats.push(n);rFilter=n;saveRec();$("cName").value="";renderRec();toast("دسته «"+n+"» ساخته شد");
 };
 $("cRen").onclick=function(){
   var old=rFilter;if(old==="all")return;
   var n=(prompt("نام جدید دسته",old)||"").trim();
   if(!n||n===old)return;
   if(cats.indexOf(n)>=0){toast("این اسم قبلاً هست");return}
-  cats[cats.indexOf(old)]=n;recs.forEach(function(r){if(r.c===old)r.c=n});rFilter=n;saveRec();$("rCat").innerHTML=catOpts(n);renderRec();
+  cats[cats.indexOf(old)]=n;recs.forEach(function(r){if(r.c===old)r.c=n});if(calcCat===old)calcCat=n;rFilter=n;saveRec();renderRec();paint();
 };
 $("cDel").onclick=function(){
   var c=rFilter;if(c==="all")return;
   var n=recs.filter(function(r){return r.c===c}).length;
   if(!confirm("دسته «"+c+"» حذف شود؟"+(n?" دستورهای آن حذف نمی‌شوند و «بدون دسته» می‌مانند.":"")))return;
-  recs.forEach(function(r){if(r.c===c)r.c=""});cats.splice(cats.indexOf(c),1);rFilter="all";saveRec();$("rCat").innerHTML=catOpts("");renderRec();
+  recs.forEach(function(r){if(r.c===c)r.c=""});cats.splice(cats.indexOf(c),1);if(calcCat===c)calcCat="";rFilter="all";saveRec();renderRec();paint();
 };
-$("rSave").onclick=function(){
-  var n=$("rName").value.trim(),i=$("rIng").value.trim(),st=$("rSteps").value.trim(),c=$("rCat").value;
-  if(!n){toast("نام دستور را بنویس");return}
-  if(!i&&!st){toast("مواد یا طرز تهیه را بنویس");return}
-  var o={n:n,c:c,i:i,s:st};
-  if(rEdit>=0){o.id=recs[rEdit].id;recs[rEdit]=o}else{o.id=Date.now();recs.unshift(o)}
-  rFilter=c===""?"all":c;saveRec();resetRec();renderRec();toast(c?"در «"+c+"» ذخیره شد":"ذخیره شد");
-};
-$("rCancel").onclick=resetRec;
 $("recList").addEventListener("click",function(e){
   var t=e.target,k;
-  if(t.hasAttribute("data-ed")){k=+t.getAttribute("data-ed");var r=recs[k];rEdit=k;$("rName").value=r.n;$("rIng").value=r.i||"";$("rSteps").value=r.s||"";$("rCat").innerHTML=catOpts(r.c);$("rH").textContent="ویرایش دستور";$("rForm").scrollIntoView({behavior:"smooth"})}
-  if(t.hasAttribute("data-cp")){k=+t.getAttribute("data-cp");var q=recs[k];copyText(q.n+"\n\nمواد لازم:\n"+(q.i||"")+"\n\nطرز تهیه:\n"+(q.s||""))}
-  if(t.hasAttribute("data-rd")){k=+t.getAttribute("data-rd");if(confirm("«"+recs[k].n+"» حذف شود؟")){recs.splice(k,1);if(rEdit===k)resetRec();else if(rEdit>k)rEdit--;saveRec();renderRec()}}
+  if(t.hasAttribute("data-ed")){k=+t.getAttribute("data-ed");loadRec(k,false);toast("ویرایش کن و «به‌روزرسانی دستور» را بزن")}
+  if(t.hasAttribute("data-nw")){k=+t.getAttribute("data-nw");loadRec(k,true);toast("به‌عنوان محاسبه جدید باز شد")}
+  if(t.hasAttribute("data-cp")){k=+t.getAttribute("data-cp");copyText(recText(recs[k]))}
+  if(t.hasAttribute("data-rd")){k=+t.getAttribute("data-rd");if(confirm("«"+recs[k].n+"» حذف شود؟")){recs.splice(k,1);if(rEdit===k)setEditMode(-1);else if(rEdit>k)rEdit--;saveRec();renderRec()}}
 });
 $("recList").addEventListener("change",function(e){
   var t=e.target;if(!t.hasAttribute("data-mv"))return;
@@ -679,13 +708,13 @@ function applyData(d){
   ing=(Array.isArray(d.ing)?d.ing:[]).map(function(i){return {n:i.n||i.name,p:+(i.p||i.price)||0,u:i.u||"kg"}}).filter(function(i){return i.n});
   hist=Array.isArray(d.hist)?d.hist:[];
   cats=Array.isArray(d.cats)&&d.cats.length?d.cats:["شیرینی‌ها","غذاها"];
-  recs=Array.isArray(d.recs)?d.recs:[];
+  recs=Array.isArray(d.recs)?d.recs:[];migrateHist();
   var dr=d.draft||{};rows=norm(Array.isArray(dr.rows)?dr.rows:[]);
   uid=rows.reduce(function(m,r){return Math.max(m,r.id||0)},0)+1;
-  $("pName").value=dr.name||"";$("pCount").value=dr.count||"1";$("extra").value=dr.extra||"";$("profit").value=(dr.profit!=null&&dr.profit!=="")?dr.profit:"30";
+  $("pNotes").value=dr.notes||"";calcCat=(dr.cat!=null)?dr.cat:(cats[0]||"");keepI="";$("pName").value=dr.name||"";$("pCount").value=dr.count||"1";$("extra").value=dr.extra||"";$("profit").value=(dr.profit!=null&&dr.profit!=="")?dr.profit:"30";
   store.set("cy_ing",ing);store.set("cy_his",hist);store.set("cy_cats",cats);store.set("cy_rec",recs);
-  rFilter="all";setEditMode(-1);resetRec();resetIng();
-  renderRows();renderIng();renderHis();updateDL();renderRec();
+  rFilter="all";setEditMode(-1);resetIng();
+  renderRows();renderIng();updateDL();renderRec();
 }
 $("gear").onclick=function(){show("set");showLast()};
 $("bkFile").onclick=function(){
@@ -712,13 +741,13 @@ $("rsFile").onchange=function(){
 };
 $("rsBtn").onclick=function(){var t=$("rsText").value.trim();if(!t){toast("متن پشتیبان را بچسبان");return}if(restoreText(t))$("rsText").value=""};
 $("wipe").onclick=function(){
-  if(!confirm("همه مواد، سوابق و دستورها برای همیشه پاک شود؟\nپیشنهاد می‌شود اول پشتیبان بگیری."))return;
+  if(!confirm("همه مواد و دستورها برای همیشه پاک شود؟\nپیشنهاد می‌شود اول پشتیبان بگیری."))return;
   if(!confirm("مطمئنی؟ این کار برگشت ندارد."))return;
   applyData({});toast("همه اطلاعات حذف شد");
 };
 $("help").onclick=function(){show("help")};
 $("helpGo").onclick=function(){show("calc")};
-renderRows();renderIng();renderHis();updateDL();renderRec();
+renderRows();renderIng();updateDL();renderRec();
 var okStore=true;try{localStorage.setItem("cy_t","1");localStorage.removeItem("cy_t")}catch(e){okStore=false}
 if(!okStore){var w=$("warn");w.style.display="block";w.textContent="در این حالت مرورگر اجازه ذخیره‌سازی نمی‌دهد و اطلاعات با بستن صفحه از بین می‌رود. فایل را مستقیم با Chrome یا Safari باز کن، یا نسخه نصبی را استفاده کن."}
 if("serviceWorker" in navigator&&/^https?:/.test(location.protocol)){try{navigator.serviceWorker.register("sw.js").catch(function(){})}catch(e){}}
